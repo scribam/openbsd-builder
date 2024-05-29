@@ -1,9 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 set -euxo pipefail
 
 OS_VERSION="$1"; shift
 ARCHITECTURE="$1"; shift
+
+packer init .
 
 packer build \
   -var os_version="$OS_VERSION" \

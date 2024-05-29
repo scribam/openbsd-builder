@@ -15,26 +15,24 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     container: ubuntu:latest
-    timeout-minutes: 60
     strategy:
         fail-fast: false
         matrix:
           version:
-            - 6.8
-            - 6.9
-            - 7.1
-            - 7.2
-            - 7.3
-            - 7.4
-            - 7.5
+            - '6.8'
+            - '6.9'
+            - '7.1'
+            - '7.2'
+            - '7.3'
+            - '7.4'
+            - '7.5'
 
           architecture:
             - x86-64
             - arm64
 
     steps:
-      - name: Clone Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
 
@@ -49,7 +47,7 @@ jobs:
 
       - uses: hashicorp/setup-packer@main
         with:
-          version: "1.7.1"
+          version: "1.10.3"
 
       - name: Install UEFI
         if: matrix.architecture == 'x86-64'
@@ -62,12 +60,11 @@ jobs:
         if: matrix.architecture == 'arm64'
         run: curl -o resources/qemu_efi.fd -L https://releases.linaro.org/components/kernel/uefi-linaro/latest/release/qemu64/QEMU_EFI.fd
 
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
+      # - uses: mxschmitt/action-tmate@v3
 
       - name: Build Image
         run: |
-          PACKER_LOG=1 ./build.sh \
+          CHECKPOINT_DISABLE=1 PACKER_LOG=1 ./build.sh \
             '${{ matrix.version }}' \
             '${{ matrix.architecture }}' \
             -var 'headless=true' \
